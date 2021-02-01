@@ -11,11 +11,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
-import os
-
+import os,sys
+# os.path拼接路径　sys.path查询导包路径　是一个列表
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+#追加系统的导包路径（两个目的１．注册子应用时写的更方便点２．修改django认证模型类时，必须以应用名．模型名）
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -38,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
+    'rest_framework',  #  drf
+    'users.apps.UsersConfig',  # 用户模块
 ]
 
 MIDDLEWARE = [
@@ -193,4 +195,6 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
 }
 
+#修改django认证系统的用户模型类
+AUTH_USER_MODEL =  'users.User'  #  应用.模型名 users.models.user自动加了models
 
