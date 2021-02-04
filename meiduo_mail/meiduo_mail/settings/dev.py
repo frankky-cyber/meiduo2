@@ -14,9 +14,18 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os,sys
 # os.path拼接路径　sys.path查询导包路径　是一个列表
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# print(sys.path)  # 我这里是没有那些导包路径的　至于为什么还不知道
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# print('hahaha')
+# print(BASE_DIR) # 这个是正确的
 #追加系统的导包路径（两个目的１．注册子应用时写的更方便点２．修改django认证模型类时，必须以应用名．模型名）
+# sys.path.insert(0,  BASE_DIR)
+sys.path.append(BASE_DIR)
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+# print(sys.path)
+"""
+['/home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/meiduo_mail/apps', '/home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/meiduo_mail/settings', '/usr/lib/python36.zip', '/usr/lib/python3.6', '/usr/lib/python3.6/lib-dynload', '/home/frank/.virtualenvs/meiduo/lib/python3.6/site-packages']
+"""
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -130,16 +139,23 @@ STATIC_URL = '/static/'
 
 #配置redis数据库作为缓存后端
 CACHES = {
-    "default": {
+    "default": {  # 缓存省市区数据
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
-    "session": {
+    "session": {  # 缓存session
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "verify_codes": {  # 存储验证码
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -192,7 +208,7 @@ LOGGING = {
 #DRF配置
 REST_FRAMEWORK = {
     # 异常处理
-    'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
+    'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',  # 问题出在这里？？？我的路径是直接到内层的meiduo_mail
 }
 
 #修改django认证系统的用户模型类
