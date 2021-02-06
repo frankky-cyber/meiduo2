@@ -84,8 +84,8 @@ var vm = new Vue({
             }
 
             // 向后端接口发送请求，让后端发送短信验证码
-            axios.get('http://127.0.0.1:8000' + '/sms_codes/' + this.mobile + '/', {
-            // axios.get('http://api.meiduo.site:8000' + '/sms_codes/' + this.mobile + '/', {
+            // axios.get('http://127.0.0.1:8000' + '/sms_codes/' + this.mobile + '/', {
+            axios.get('http://api.meiduo.site:8000' + '/sms_codes/' + this.mobile + '/', {
             // axios.get(this.host + '/sms_codes/' + this.mobile + '/', {
                 responseType: 'json'
             })
