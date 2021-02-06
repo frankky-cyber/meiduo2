@@ -8,6 +8,8 @@ from rest_framework.response import Response
 import logging
 from rest_framework import status
 from .import constants
+from celery_tasks.sms.tasks import send_sms_code
+
 
 logger = logging.getLogger('django')  # 用日志输出
 # Create your views here.
@@ -37,7 +39,10 @@ class SMScodeView(APIView):
         time.sleep(5) #现在是单线程吗　就已经是多任务了吧　服务器自己解决的runserver或者你部署nginx等
         #利用容联云通讯发送短信验证码
         # CCP().send_template_sms(to, datas, temp_id) to是手机号　datas是列表[验证码,５] 5是分钟表示过期时间　还有短信内容的模板
-        CCP().send_template_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60], 1)
+        # CCP().send_template_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60], 1)
+        # 触发异步任务，将异步任务添加到celery任务队列
+        send_sms_code(mobile, sms_code)  # 这么做是错的　调用普通函数而已
+        send_sms_code.delay(mobile, sms_code)  # 触发异步任务
         #响应
         return Response({'message':'ok'})
     

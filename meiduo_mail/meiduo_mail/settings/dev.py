@@ -16,13 +16,16 @@ import os,sys
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # print(sys.path)  # 我这里是没有那些导包路径的　至于为什么还不知道
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # print('hahaha')
 # print(BASE_DIR) # 这个是正确的
+# print(PROJECT_DIR) # 这个是正确的
 #追加系统的导包路径（两个目的１．注册子应用时写的更方便点２．修改django认证模型类时，必须以应用名．模型名）
 # sys.path.insert(0,  BASE_DIR)
 sys.path.append(BASE_DIR)
+sys.path.append(PROJECT_DIR)
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
-# print(sys.path)
+print(sys.path)
 """
 ['/home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/meiduo_mail/apps', '/home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/meiduo_mail/settings', '/usr/lib/python36.zip', '/usr/lib/python3.6', '/usr/lib/python3.6/lib-dynload', '/home/frank/.virtualenvs/meiduo/lib/python3.6/site-packages']
 """
