@@ -12,7 +12,6 @@ logger = logging.getLogger('django')  # 用日志输出
 class SMScodeView(APIView):
     """短信验证码"""
     def get(self, request, mobile):
-        #1.生成验证码
         sms_code  = '%06d'  % randint(0, 999999)
         logger.info(sms_code)
         #2.创建redis连接对象

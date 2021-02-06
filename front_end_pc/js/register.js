@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        // host:host,
         host,
         error_name: false,
         error_password: false,
@@ -8,109 +9,67 @@ var vm = new Vue({
         error_phone: false,
         error_allow: false,
         error_sms_code: false,
+        sending_flag: false,
 
         username: '',
         password: '',
         password2: '',
-        mobile: '', 
+        mobile: '',
         sms_code: '',
         allow: false,
+        sms_code_tip: '获取短信验证码',  // a标签文字
+        error_sms_code_message: ''  // 验证码错误提示信息
 
-        sms_code_tip: '获取短信验证码',
-        sending_flag: false, // 正在发送短信标志
-        error_name_message: '', // 用户名错误提示
-        error_phone_message: '', // 手机号错误提示
-        error_sms_code_message: '' // 短信验证码错误
     },
     methods: {
-        // 检查用户名
-        check_username: function (){
+        check_username: function () {
             var len = this.username.length;
-            if(len<5||len>20) {
-                this.error_name_message = '请输入5-20个字符的用户名';
+            if (len < 5 || len > 20) {
                 this.error_name = true;
             } else {
                 this.error_name = false;
             }
-            // 检查重名
-            if (this.error_name == false) {
-                axios.get(this.host + '/usernames/' + this.username + '/count/', {
-                        responseType: 'json'
-                    })
-                    .then(response => {
-                        if (response.data.count > 0) {
-                            this.error_name_message = '用户名已存在';
-                            this.error_name = true;
-                        } else {
-                            this.error_name = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error.response.data);
-                    })
-            }
         },
-        check_pwd: function (){
+        check_pwd: function () {
             var len = this.password.length;
-            if(len<8||len>20){
+            if (len < 8 || len > 20) {
                 this.error_password = true;
             } else {
                 this.error_password = false;
-            }        
+            }
         },
-        check_cpwd: function (){
-            if(this.password!=this.password2) {
+        check_cpwd: function () {
+            if (this.password != this.password2) {
                 this.error_check_password = true;
             } else {
                 this.error_check_password = false;
-            }        
+            }
         },
-        // 检查手机号
-        check_phone: function (){
-            var re = /^1[345789]\d{9}$/;
-            if(re.test(this.mobile)) {
+        check_phone: function () {
+            var re = /^1[3456789]\d{9}$/;
+            if (re.test(this.mobile)) {
                 this.error_phone = false;
             } else {
-                this.error_phone_message = '您输入的手机号格式不正确';
                 this.error_phone = true;
             }
-            if (this.error_phone == false) {
-                axios.get(this.host + '/mobiles/'+ this.mobile + '/count/', {
-                        responseType: 'json'
-                    })
-                    .then(response => {
-                        if (response.data.count > 0) {
-                            this.error_phone_message = '手机号已存在';
-                            this.error_phone = true;
-                        } else {
-                            this.error_phone = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error.response.data);
-                    })
-            }
         },
-        check_sms_code: function(){
-            if(!this.sms_code){
+        check_sms_code: function () {
+            if (!this.sms_code) {
                 this.error_sms_code = true;
             } else {
                 this.error_sms_code = false;
             }
         },
-        check_allow: function(){
-            if(!this.allow) {
+        check_allow: function () {
+            if (!this.allow) {
                 this.error_allow = true;
             } else {
                 this.error_allow = false;
             }
         },
-        // 发送手机短信验证码
-        send_sms_code: function(){
 
-            // 重新发送短信后，隐藏提示信息
-            this.error_sms_code = false;
-
+        // 发送短信验证码
+        send_sms_code: function () {
             if (this.sending_flag == true) {
                 return;
             }
@@ -125,11 +84,13 @@ var vm = new Vue({
             }
 
             // 向后端接口发送请求，让后端发送短信验证码
-            axios.get(this.host + '/sms_codes/' + this.mobile + '/', {
-                    responseType: 'json'
-                })
+            axios.get('http://127.0.0.1:8000' + '/sms_codes/' + this.mobile + '/', {
+            // axios.get('http://api.meiduo.site:8000' + '/sms_codes/' + this.mobile + '/', {
+            // axios.get(this.host + '/sms_codes/' + this.mobile + '/', {
+                responseType: 'json'
+            })
                 .then(response => {
-                    // 表示后端发送短信成功
+                    // 表示后端发送短信成功 
                     // 倒计时60秒，60秒后允许用户再次点击发送短信验证码的按钮
                     var num = 60;
                     // 设置一个计时器
@@ -160,15 +121,13 @@ var vm = new Vue({
                 })
         },
         // 注册
-        on_submit: function(){
+        on_submit: function () {
             this.check_username();
             this.check_pwd();
             this.check_cpwd();
             this.check_phone();
             this.check_sms_code();
             this.check_allow();
-
-
         }
     }
 });
