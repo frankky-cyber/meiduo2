@@ -25,7 +25,7 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__
 sys.path.append(BASE_DIR)
 sys.path.append(PROJECT_DIR)
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
-print(sys.path)
+# print(sys.path)
 """
 ['/home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/meiduo_mail/apps', '/home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/meiduo_mail/settings', '/usr/lib/python36.zip', '/usr/lib/python3.6', '/usr/lib/python3.6/lib-dynload', '/home/frank/.virtualenvs/meiduo/lib/python3.6/site-packages']
 """

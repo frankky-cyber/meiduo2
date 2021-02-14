@@ -35,8 +35,8 @@ class SMScodeView(APIView):
         pl.setex('send_flag_%s' % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)  # 键，存储时间秒，值
         # 执行管道
         pl.execute()
-        import time
-        time.sleep(5) #现在是单线程吗　就已经是多任务了吧　服务器自己解决的runserver或者你部署nginx等
+        # import time
+        # time.sleep(5) #现在是单线程吗　就已经是多任务了吧　服务器自己解决的runserver或者你部署nginx等
         #利用容联云通讯发送短信验证码
         # CCP().send_template_sms(to, datas, temp_id) to是手机号　datas是列表[验证码,５] 5是分钟表示过期时间　还有短信内容的模板
         # CCP().send_template_sms(mobile, [sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60], 1)
