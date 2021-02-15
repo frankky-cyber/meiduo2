@@ -228,3 +228,9 @@ CORS_ORIGIN_WHITELIST = (
     'api.meiduo.site:8000'  # 后端的也要加上
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许跨域时携带cookie
+
+#JWT的有效期
+import datetime
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+}

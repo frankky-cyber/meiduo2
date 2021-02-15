@@ -2,17 +2,19 @@ from rest_framework import serializers
 from users.models import User
 import re
 from django_redis import get_redis_connection 
+from rest_framework_jwt.settings import api_settings
 class CreateUserSerializer(serializers.ModelSerializer):
     """注册序列化器"""
-    # 序列化字段['id', 'username','mobile'] 返回给前端的
+    # 序列化字段['id', 'username','mobile'] 返回给前端的 　又加了token
     # 反序列化字段 ['username', 'password', 'password2', 'mobile', 'sms_code', 'allow']
     password2 = serializers.CharField(label='确认密码', write_only=True)
     sms_code = serializers.CharField(label='验证码', write_only=True)
     allow = serializers.CharField(label='同意协议', write_only=True)  # 'true'
+    token = serializers.CharField(label='token', read_only=True)
     class Meta:
         model = User
         # fields = "__all__"  #不能是所有的
-        fields = ['id', 'username', 'password', 'password2', 'mobile', 'sms_code', 'allow']  # id默认是只读的
+        fields = ['id', 'username', 'password', 'password2', 'mobile', 'sms_code', 'allow','token']  # id默认是只读的
         extra_kwargs = {
             'username': {
                 'min_length': 5,
@@ -60,15 +62,21 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return attrs
     def create(self, validated_data):
         """重写create方法　modelserializer的create方法会将所有字段进行存储我们并不需要"""
-        print("************************************************************************************************")
-        print(validated_data)
-        del validated_data['password2']  # validated_data是所有字段的数据　删掉后就只剩下username password mobile 存储到数据库中　但是
+    
+        del validated_data['password2']  # validated_data是校验的所有字段的数据　删掉后就只剩下username password mobile 存储到数据库中　但是
         del validated_data['sms_code']  # 问题是数据库中表有很多字段啊　只存这３个可以吗？
         del validated_data['allow']
         password = validated_data.pop('password')
         user = User(**validated_data)  # 关键字参数形式传递
         user.set_password(password)  # 把密码加密后再赋值给user的password属性
         user.save()
+        #这里加token的原理是什么呢？
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER  # 生成payload函数的引用
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER   # 生成JWT
+
+        payload = jwt_payload_handler(user)  # 根据user生成用户的载荷部分(字典)
+        token = jwt_encode_handler(payload)  # 传入载荷生成完整的jwt
+        user.token = token
         return user
 
 
