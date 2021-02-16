@@ -236,3 +236,7 @@ JWT_AUTH = {
     # 修改构造JWT视图响应数据的函数位置
     'JWT_RESPONSE_PAYLOAD_HANDLER':'users.utils.jwt_response_payload_handler',
 }
+
+# 修改django后端用户认证类
+# AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']　默认的
+AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend']
