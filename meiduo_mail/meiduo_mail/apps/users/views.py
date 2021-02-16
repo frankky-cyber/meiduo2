@@ -34,4 +34,3 @@ class MobileCountView(APIView):
         }
         # 响应
         return Response(data)
- 

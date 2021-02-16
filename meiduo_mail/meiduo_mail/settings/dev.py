@@ -233,4 +233,6 @@ CORS_ALLOW_CREDENTIALS = True  # 允许跨域时携带cookie
 import datetime
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    # 修改构造JWT视图响应数据的函数位置
+    'JWT_RESPONSE_PAYLOAD_HANDLER':'users.utils.jwt_response_payload_handler',
 }
