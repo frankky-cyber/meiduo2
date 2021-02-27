@@ -10,7 +10,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(label='确认密码', write_only=True)
     sms_code = serializers.CharField(label='验证码', write_only=True)
     allow = serializers.CharField(label='同意协议', write_only=True)  # 'true'
-    token = serializers.CharField(label='token', read_only=True)
+    token = serializers.CharField(label='token', read_only=True)  # 想返回给前端，要么source要么临时加一个
     class Meta:
         model = User
         # fields = "__all__"  #不能是所有的
@@ -23,6 +23,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
                     'min_length': '仅允许5-20个字符的用户名',
                     'max_length': '仅允许5-20个字符的用户名',
                 }
+                # 在没写自定义验证下，可以验证不能为空和最大最小字符数(在这个范围之内)
             },
             'password': {
                 'write_only': True,
@@ -63,7 +64,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """重写create方法　modelserializer的create方法会将所有字段进行存储我们并不需要"""
     
-        del validated_data['password2']  # validated_data是校验的所有字段的数据　删掉后就只剩下username password mobile 存储到数据库中　但是
+        del validated_data['password2']  # validated_data是校验过的所有字段的数据　删掉后就只剩下username password mobile 存储到数据库中　但是
         del validated_data['sms_code']  # 问题是数据库中表有很多字段啊　只存这３个可以吗？
         del validated_data['allow']
         password = validated_data.pop('password')
@@ -77,6 +78,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
         payload = jwt_payload_handler(user)  # 根据user生成用户的载荷部分(字典)
         token = jwt_encode_handler(payload)  # 传入载荷生成完整的jwt
         user.token = token
-        return user
+        return user  # 返回模型类的实例对象干刚创建的那个啊
 
 

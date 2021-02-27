@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',  #  drf
     'corsheaders',  # 解决跨域问题
     'users.apps.UsersConfig',  # 用户模块
+    'oauth.apps.OauthConfig',  # QQ模块　发短信应用没有模型什么的就不用注册
 ]
 
 MIDDLEWARE = [
@@ -240,3 +241,8 @@ JWT_AUTH = {
 # 修改django后端用户认证类
 # AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']　默认的
 AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend']
+
+# QQ登录参数
+QQ_CLIENT_ID = '101474184'  # appid
+QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c'  # appkey
+QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'  # 回调域名
