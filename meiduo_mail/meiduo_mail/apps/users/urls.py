@@ -10,4 +10,8 @@ urlpatterns = [
     url(r'^mobiles/(?P<mobile>1[3-9]\d{9})/count/$', views.MobileCountView.as_view()),
     # JWT登录　这个视图帮你完成校验　签发token最后响应　其实是封装了django自带的验证然后加了token再然后响应
     url(r'^authorizations/$', obtain_jwt_token),  
+    # 用户详情
+    url(r'^user/$', views.UserDetail.as_view()),  
+    # 更新邮箱
+    url(r'^email/$', views.EmailView.as_view()),  
 ]

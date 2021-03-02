@@ -3,6 +3,7 @@ from users.models import User
 import re
 from django_redis import get_redis_connection 
 from rest_framework_jwt.settings import api_settings
+from celery_tasks.email.tasks import send_verify_email
 class CreateUserSerializer(serializers.ModelSerializer):
     """注册序列化器"""
     # 序列化字段['id', 'username','mobile'] 返回给前端的 　又加了token
@@ -80,4 +81,30 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.token = token
         return user  # 返回模型类的实例对象干刚创建的那个啊
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    """用户详情序列化器"""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'mobile', 'email', 'email_active']
 
+class EmailSerializer(serializers.ModelSerializer):
+    """更改邮箱序列化器"""
+    """校验的话不需要写了　自动帮我们校验的"""
+    class Meta:
+        model = User
+        fields = ['id', 'email']
+        # email字段必须要传值过来　一个字段有默认值或者允许为空的 'required':False 我们修改为True
+        extra_kwargs = {
+            'email':{
+                'required':True
+            }
+        }
+    def update(self, instance, validated_data):
+        """重写此方法　目的不是为了修改而是借此时机发激活邮箱"""
+        # super().update(instance, validated_data)  可以这么写　也可以自己写
+        instance.email = validated_data.get('email')
+        instance.save()
+        # 将来在此写发邮件的功能　用异步的方式先给前端响应　让后台发邮件去
+        # send_email()
+        send_verify_email.delay(instance.email, verify_url='xxx')
+        return instance
