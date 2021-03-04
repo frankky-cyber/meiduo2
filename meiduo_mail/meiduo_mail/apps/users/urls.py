@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^authorizations/$', obtain_jwt_token),  
     # 用户详情
     url(r'^user/$', views.UserDetail.as_view()),  
-    # 更新邮箱
+    # 更新邮箱 
     url(r'^email/$', views.EmailView.as_view()),  
+    url(r'^emails/verification/$', views.EmailVerifyView.as_view()),  
 ]

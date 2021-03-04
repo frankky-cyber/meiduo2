@@ -106,5 +106,8 @@ class EmailSerializer(serializers.ModelSerializer):
         instance.save()
         # 将来在此写发邮件的功能　用异步的方式先给前端响应　让后台发邮件去
         # send_email()
-        send_verify_email.delay(instance.email, verify_url='xxx')
+        # http://www.meiduo.site:8080/success_verify_email.html?token=1  # token放与用户相关的信息最好让用户看不懂　加密一下设置过期时间
+        # verify_url = generate_email_verify_url(instance) 封装成函数　放utils文件里　封装成方法也可以
+        verify_url = instance.generate_email_verify_url() #将字典数据加密成看不懂的字符串
+        send_verify_email.delay(instance.email, verify_url=verify_url)
         return instance

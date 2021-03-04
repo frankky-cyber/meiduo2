@@ -51,7 +51,7 @@ var vm = new Vue({
                     .then(response => {
                         // 使用浏览器本地存储保存token
                         if (this.remember) {
-                            // 记住登录
+                            // 记住登录　原本的token啥的覆盖了
                             sessionStorage.clear();
                             localStorage.token = response.data.token;
                             localStorage.user_id = response.data.user_id;
