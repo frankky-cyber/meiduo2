@@ -52,10 +52,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',  #  drf
+
+    'rest_framework',  #  drf　　第三方的应用写在中间并用空行隔起来
     'corsheaders',  # 解决跨域问题
-    'users.apps.UsersConfig',  # 用户模块
+
+    'users.apps.UsersConfig',  # 用户模块　自己的应用写在最下面
     'oauth.apps.OauthConfig',  # QQ模块　发短信应用没有模型什么的就不用注册
+    'areas.apps.AreasConfig',  #省市区模块
 ]
 
 MIDDLEWARE = [

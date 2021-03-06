@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^', include('verifications.urls')),   #发短信模块
     url(r'^', include('users.urls')),   #注册
     url(r'^oauth/', include('oauth.urls')),   #qq模块
+    url(r'^', include('areas.urls')),   #省市区模块
 ]
