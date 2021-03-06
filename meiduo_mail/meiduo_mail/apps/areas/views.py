@@ -6,6 +6,7 @@ from areas.serializers import AreaSerializer, SubsSerializer
 from rest_framework import status
 from rest_framework.generics import ListAPIView,RetrieveAPIView
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework_extensions.mixins import CacheResponseMixin
 # Create your views here.
 
 # class  AreaListView(APIView):
@@ -44,7 +45,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 #     queryset =  Area.objects.all()
 
 
-class AreaViewSet(ReadOnlyModelViewSet):
+class AreaViewSet(CacheResponseMixin, ReadOnlyModelViewSet):  # CacheResponseMixin一定要放在前面　将视图要返回的数据放在缓存中，优先去缓存中拿，缓存中没有在俩菏泽里去数据库中查找返回并存到缓存里面
     def get_queryset(self):
         """重写次方法"""
         if self.action =='list':

@@ -9,5 +9,5 @@ urlpatterns = [
     
 ]
 router  = routers.DefaultRouter()
-router.register(r"areas", AreaViewSet, base_name='area')  # 注意这里必须指定base_name　默认会找queryset里面的模型的名字的小写但是我们没有定义queryset如果这里不指定的话就会报错
+router.register(r"areas", AreaViewSet, base_name='area')  # 注意这里必须指定base_name　默认会找queryset里面的模型的名字的小写但是我们没有定义queryset如果这里不指定的话就会断言（输出一句话也不是报错）
 urlpatterns += router.urls
