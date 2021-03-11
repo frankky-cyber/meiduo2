@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User
+from users.models import User,Address
 import re
 from django_redis import get_redis_connection 
 from rest_framework_jwt.settings import api_settings
@@ -111,3 +111,44 @@ class EmailSerializer(serializers.ModelSerializer):
         verify_url = instance.generate_email_verify_url() #将字典数据加密成看不懂的字符串
         send_verify_email.delay(instance.email, verify_url=verify_url)
         return instance
+
+class UserAddressSerializer(serializers.ModelSerializer):
+    """
+    用户地址序列化器
+    """
+    # source那个是新增加的　注意区别　这个是替换
+    province = serializers.StringRelatedField(read_only=True)  #自己重新定义了省市区字段　不用模型里面的　因为模型里面是外键　映射过来只有id
+    city = serializers.StringRelatedField(read_only=True)
+    district = serializers.StringRelatedField(read_only=True)
+    # required 表示前端务必传对应的字段的值过来不然会报错　默认也是true自己又指定一下也可以
+    province_id = serializers.IntegerField(label='省ID', required=True)
+    city_id = serializers.IntegerField(label='市ID', required=True)
+    district_id = serializers.IntegerField(label='区ID', required=True)
+
+    class Meta:
+        model = Address
+        exclude = ('user', 'is_deleted', 'create_time', 'update_time')
+
+    def validate_mobile(self, value):
+        """
+        验证手机号
+        """
+        if not re.match(r'^1[3-9]\d{9}$', value):
+            raise serializers.ValidationError('手机号格式错误')
+        return value
+
+    def create(self,validated_data):
+        #现在的问题是如何获取user　在视图里面可以request.user来获取　serializer里面如何获取呢?
+        # 注意我们继承的genericapiview他帮我们实现的　如果是apiview的话我们要传这个参数
+        user = self.context['request'].user  
+        validated_data['user'] = user
+        instance = Address.objects.create(**validated_data)
+        return instance
+
+class AddressTitleSerializer(serializers.ModelSerializer):
+    """
+    地址标题
+    """
+    class Meta:
+        model = Address
+        fields = ('title',)

@@ -49,7 +49,8 @@ class AreaViewSet(CacheResponseMixin, ReadOnlyModelViewSet):  # CacheResponseMix
     def get_queryset(self):
         """重写次方法"""
         if self.action =='list':
-            return Area.objects.filter(parent = None)
+            return Area.objects.filter(parent = None) 
+            # return Area.objects.filter(parent__isnull = True)  # 两种写法都可以
         else:
             return Area.objects.all()
         

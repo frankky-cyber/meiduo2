@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView,CreateAPIView,RetrieveAPIView,UpdateAPIView
 from rest_framework.views import APIView
-from users.serializers import CreateUserSerializer,UserDetailSerializer,EmailSerializer
-from users.models import User
+from users.serializers import CreateUserSerializer,UserDetailSerializer,EmailSerializer,UserAddressSerializer,AddressTitleSerializer
+from users.models import User,Address
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.decorators import action
 # Create your views here.
 class UserView(CreateAPIView):
     # 指定序列化器
@@ -47,6 +51,8 @@ class UserDetail(RetrieveAPIView):
         return self.request.user  # 经过认证之后的　是哪一个用户　是否需要自己写认证类？
 
 class EmailView(UpdateAPIView):
+
+
     """更新邮箱"""
     serializer_class = EmailSerializer
     permission_classes = [IsAuthenticated]
@@ -81,3 +87,81 @@ class EmailVerifyView(APIView):  # 没用啥序列化器啥的就简单的apivie
         user.save()
         # 响应
         return Response({'message':'ok'})
+
+class AdressSetView(UpdateModelMixin, GenericViewSet):
+    """用户收获地址增删改查"""
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserAddressSerializer
+    # 重写get_queryset方法　返回一个queryset
+    def get_queryset(self):
+        #self.request.user.addresses.all()是一个queryset　得到queryset之后继续进行了筛选并省略了all()
+        return self.request.user.addresses.filter(is_deleted=False)
+
+    def create(self, request):
+        user = request.user
+        # count = user.addresses.all().count()  #两种方法都可以
+        count = Address.objects.filter(user=user).count()
+        """重写此方法因为需要进行判断　收获地址数量有上限　收获地址最多有20个"""
+        if count >= 20:
+            return Response({'message':"收获地址数量达到上限"}, status = status.HTTP_400_BAD_REQUEST)
+        else:
+            pass
+            # 对传过来的数据进行校验　创建序列化器，反序列化，保存数据，返回响应
+            serializer = self.get_serializer(data = request.data)
+            serializer.is_valid(raise_exception = True)
+            serializer.save()
+            return Response(serializer.data, status= status.HTTP_201_CREATED)
+     # GET /addresses/
+    
+    def list(self, request, *args, **kwargs):
+        """
+        用户地址列表数据
+        """
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        user = self.request.user
+        return Response({
+            'user_id': user.id,
+            'default_address_id': user.default_address_id,
+            'limit': 20,
+            'addresses': serializer.data,
+        })
+    
+     
+     
+     # delete /addresses/<pk>/
+    def destroy(self, request, *args, **kwargs):
+        """
+        处理删除
+        """
+        address = self.get_object()
+
+        # 进行逻辑删除
+        address.is_deleted = True
+        address.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    # put /addresses/pk/title/
+    # 需要请求体参数 title
+    @action(methods=['put'], detail=True)  # 都是put不会冲突吗？路由是不一样的吗？是不一样的　会将函数名称放在路由里面
+    def title(self, request, pk=None):
+        """
+        修改标题
+        """
+        address = self.get_object()
+        serializer = AddressTitleSerializer(instance=address, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    # put /addresses/pk/status/
+    @action(methods=['put'], detail=True)
+    def status(self, request, pk=None):
+        """
+        设置默认地址
+        """
+        address = self.get_object()
+        request.user.default_address = address
+        request.user.save()
+        return Response({'message': 'OK'}, status=status.HTTP_200_OK)

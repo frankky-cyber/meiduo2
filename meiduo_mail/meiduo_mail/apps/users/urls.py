@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from users import views
 from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework import routers
 urlpatterns = [
     #注册用户
     url(r'^users/$', views.UserView.as_view()),
@@ -16,3 +17,12 @@ urlpatterns = [
     url(r'^email/$', views.EmailView.as_view()),  
     url(r'^emails/verification/$', views.EmailVerifyView.as_view()),  
 ]
+router = routers.DefaultRouter()
+router.register(r'addresses',views.AdressSetView,base_name='addresses')  # address好像也可以
+urlpatterns += router.urls
+# POST /addresses/ 新建  -> create
+# PUT /addresses/<pk>/ 修改  -> update
+# GET /addresses/  查询  -> list
+# DELETE /addresses/<pk>/  删除 -> destroy
+# PUT /addresses/<pk>/status/ 设置默认 -> status
+# PUT /addresses/<pk>/title/  设置标题 -> title
