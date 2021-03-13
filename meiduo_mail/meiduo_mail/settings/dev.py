@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',  # 用户模块　自己的应用写在最下面
     'oauth.apps.OauthConfig',  # QQ模块　发短信应用没有模型什么的就不用注册
     'areas.apps.AreasConfig',  #省市区模块
+    'goods.apps.GoodsConfig',  #商品模块
+    'contents.apps.ContentsConfig',#广告模块
 ]
 
 MIDDLEWARE = [
