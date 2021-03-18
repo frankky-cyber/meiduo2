@@ -55,6 +55,9 @@ INSTALLED_APPS = [
 
     'rest_framework',  #  drf　　第三方的应用写在中间并用空行隔起来
     'corsheaders',  # 解决跨域问题
+    'ckeditor',  # 富文本编辑器
+    'ckeditor_uploader',  # 富文本编辑器上传图片模块
+    'django_crontab',  # 定时任务
 
     'users.apps.UsersConfig',  # 用户模块　自己的应用写在最下面
     'oauth.apps.OauthConfig',  # QQ模块　发短信应用没有模型什么的就不用注册
@@ -79,7 +82,7 @@ ROOT_URLCONF = 'meiduo_mail.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],   # 指定模板文件加载路径 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,9 +136,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -277,3 +282,37 @@ REST_FRAMEWORK_EXTENSIONS = {
     # 缓存存储
     'DEFAULT_USE_CACHE': 'default',
 }
+
+
+# django文件存储
+DEFAULT_FILE_STORAGE = 'meiduo_mail.utils.fastdfs.fdfs_storage.FastDFSStorage'
+
+
+
+# FastDFS
+# FDFS_URL = 'http://image.meiduo.site:8888/'  
+# FDFS_URL = 'http://192.168.0.103:8888/'  
+# FDFS_BASE_URL = 'http://192.168.0.103:8888/'  
+FDFS_BASE_URL = 'http://image.meiduo.site:8888/' 
+FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
+
+# 富文本编辑器ckeditor配置
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',  # 工具条功能
+        'height': 300,  # 编辑器高度
+        # 'width': 300,  # 编辑器宽
+    },
+}
+CKEDITOR_UPLOAD_PATH = ''  # 上传图片保存路径，使用了FastDFS，所以此处设为''
+
+# 生成的静态html文件保存目录
+GENERATED_STATIC_HTML_FILES_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'front_end_pc')
+# 解决crontab中文问题
+CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
+# 定时任务
+CRONJOBS = [
+    # 每5分钟执行一次生成主页静态文件
+    # ('*/5 * * * *', 'contents.crons.generate_static_index_html', '>> /Users/delron/Desktop/meiduo_mall/logs/crontab.log')
+    ('*/1 * * * *', 'contents.crons.generate_static_index_html', '>> /home/frank/Desktop/pycharm/projects/meiduo2/meiduo_mail/logs/crontab.log')
+]
