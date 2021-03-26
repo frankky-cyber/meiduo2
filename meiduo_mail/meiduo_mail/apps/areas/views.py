@@ -46,6 +46,7 @@ from rest_framework_extensions.mixins import CacheResponseMixin
 
 
 class AreaViewSet(CacheResponseMixin, ReadOnlyModelViewSet):  # CacheResponseMixin一定要放在前面　将视图要返回的数据放在缓存中，优先去缓存中拿，缓存中没有在俩菏泽里去数据库中查找返回并存到缓存里面
+    pagination_class = None   # 禁用分页 
     def get_queryset(self):
         """重写次方法"""
         if self.action =='list':

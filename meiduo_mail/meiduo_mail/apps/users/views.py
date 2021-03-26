@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView,CreateAPIView,RetrieveAPIView,UpdateAPIView
 from rest_framework.views import APIView
-from users.serializers import CreateUserSerializer,UserDetailSerializer,EmailSerializer,UserAddressSerializer,AddressTitleSerializer
+from users.serializers import CreateUserSerializer,UserDetailSerializer,EmailSerializer,UserAddressSerializer,AddressTitleSerializer,UserBrowserHistorySerializer
 from users.models import User,Address
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -165,3 +165,10 @@ class AdressSetView(UpdateModelMixin, GenericViewSet):
         request.user.default_address = address
         request.user.save()
         return Response({'message': 'OK'}, status=status.HTTP_200_OK)
+
+
+class UserBrowserHistory(CreateAPIView):
+    """用户浏览记录"""
+    # 指定序列化器
+    serializer_class = UserBrowserHistorySerializer
+    permission_classes = [IsAuthenticated]  # 指定权限

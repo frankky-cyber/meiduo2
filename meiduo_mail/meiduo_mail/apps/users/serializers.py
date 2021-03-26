@@ -4,6 +4,7 @@ import re
 from django_redis import get_redis_connection 
 from rest_framework_jwt.settings import api_settings
 from celery_tasks.email.tasks import send_verify_email
+from goods.models import SKU
 class CreateUserSerializer(serializers.ModelSerializer):
     """注册序列化器"""
     # 序列化字段['id', 'username','mobile'] 返回给前端的 　又加了token
@@ -152,3 +153,34 @@ class AddressTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         fields = ('title',)
+
+class UserBrowserHistorySerializer(serializers.Serializer):
+    """保存商品浏览记录序列化器"""
+    sku_id = serializers.IntegerField(label='商品sku_id', min_value = 1)  # label是直接访问后端时填写表单时显示的　不是站点
+    def validate_sku_id(self, value):
+        """单独对sku_id进行校验　校验其是否存在"""
+        try:
+            SKU.objects.get(id= value)
+        except SKU.DoesNotExist:
+            raise serializers.ValidationError('sku_id无效')
+        return value
+
+    def create(self, validated_data):
+        sku_id = validated_data.get('sku_id')
+        # 获取用户对象
+        user = self.context['request'].user
+        # 创建redis连接对象
+        redis_conn = get_redis_connection('history')
+        # 创建redis管道
+        pl = redis_conn.pipeline()
+        # 先去重
+        pl.lrem('history % d' % user.id,  0, sku_id)
+        # 再添加到列表的开头
+        pl.lpush('history % d' % user.id,  sku_id)
+        # 再截取列表中的前５个元素
+        pl.ltrim('history % d' % user.id, 0, 4)
+        # 执行管道
+        pl.execute()
+        # 通常来说是要返回一个模型对象的　否则self.instance接受不到　serializer.data的时候会出问题的吧
+        # return obj  为什么是validated_data
+        return validated_data

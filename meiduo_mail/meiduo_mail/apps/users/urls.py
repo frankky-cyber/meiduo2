@@ -16,6 +16,7 @@ urlpatterns = [
     # 更新邮箱 
     url(r'^email/$', views.EmailView.as_view()),  
     url(r'^emails/verification/$', views.EmailVerifyView.as_view()),  
+    url(r'^browse_histories/$', views.UserBrowserHistory.as_view()),  
 ]
 router = routers.DefaultRouter()
 router.register(r'addresses',views.AdressSetView,base_name='addresses')  # address好像也可以
